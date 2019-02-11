@@ -1,0 +1,60 @@
+
+
+
+
+const roblox = require('noblox.js')
+const Discord = require('discord.js')
+const client = new Discord.Client();
+var token = "NTQ0NTQzNzEyMTA1OTg4MDk3.D0MpZw.ZWHDYIyaWR-nCmfpxo_pFxryTPs";
+
+client.login(token)
+
+var cookie = "_|WARNING:-DO-NOT-SHARE-THIS.--Sharing-this-will-allow-someone-to-log-in-as-you-and-to-steal-your-ROBUX-and-items.|_1E3AF68DD931E2A2E87A0C71ECAAE8806497A1E45EFB8A75AC4ED0630337807EA644931B5DD8774951ACCE27B81E542B22BEA6FE4BA0990169B37B67B85CBBD63E1319BE641BFA79BCC5DB0392ED775E3C9A3546D9DEDA26CE8B177ADC0C30A39792A9FB775B2476D461970B014914E68D86D1C2C113DE4836366913B9A18099AB6C5C2DB5AC3658D389B8E9700F0619E22707F3637041B495E2A2FBFD188323A269E1A3E64C784599FEAB2AB14ED8747FA18D80F43DCDEEA7D2096888D7761D5760C97C9004C5C0DDA62B00BDC54DCC48B23BF19E6AF8803CA945D769391CC4D4B21A8E7DD49759366F7A0D41209B1436564404B4DA0B59E329C3B374C59B2470F88290A3301A865BEDF179FD88E1CDC47A6AD8DB9633336013ED536F57BA0FCE5604E675451A24232894A6AD258F704EF62244";
+var prefix = '!';
+var groupId = 4730692;
+var maximumRank = 6;
+
+function login() {
+    return roblox.cookieLogin();
+}
+
+login() // Log into ROBLOX
+    .then(function() { // After the function has been executed
+        console.log('Logged in.') // Log to the console that we've logged in
+    })
+    .catch(function(error) { // This is a catch in the case that there's an error. Not using this will result in an unhandled rejection error.
+        console.log(`Login error: ${error}`) // Log the error to console if there is one.
+    });
+ 
+function isCommand(command, message){
+    var command = command.toLowerCase();
+    var content = message.content.toLowerCase();
+    return content.startsWith(prefix + command);
+}
+ 
+client.on('message', (message) => {
+    if (message.author.bot) return; // Dont answer yourself.
+    var args = message.content.split(/[ ]+/)
+   
+    if(isCommand('rank', message)){
+       if(!message.member.roles.some(r=>["Ranker"].includes(r.name)) ) // OPTIONAL - Checks if the sender has the specified roles to carry on further
+        return message.reply("You can't use this command.");
+        var username = args[1]
+        var rankIdentifier = Number(args[2]) ? Number(args[2]) : args[2];
+        if (!rankIdentifier) return message.channel.send("Please enter a rank");
+        if (username){
+            message.channel.send(`Checking ROBLOX for ${username}`)
+            roblox.getIdFromUsername(username)
+            .then(function(id){
+                roblox.getRankInGroup(groupId, id)
+                .then(function(rank){
+                    if(maximumRank <= rank){
+                        message.channel.send(`${id} is rank ${rank} and not promotable.`)
+                    } else {
+                        message.channel.send(`${id} is rank ${rank} and promotable.`)
+                        roblox.setRank(groupId, id, rankIdentifier)
+                        .then(function(newRole){
+                            message.channel.send(`Changed rank to ${newRole.Name}`)
+                        }).catch(function(err){
+                            console.error(err)
+                            message.channel.send("Failed to 
