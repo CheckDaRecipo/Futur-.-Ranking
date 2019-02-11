@@ -1,0 +1,2 @@
+# Futur-.-Ranking
+Ranking Bot
